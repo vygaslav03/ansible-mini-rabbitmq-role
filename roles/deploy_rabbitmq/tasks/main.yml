@@ -1,0 +1,42 @@
+---
+# tasks file for deploy_rabbitmq
+become: yes
+
+- name: Generate RabbitMq script on Ubuntu Server
+  template:
+    src: "{{ source_folder }}/rabbitmq.j2"
+    dest: "{{ destin_folder }}/rabbitmq.sh"
+    mode: '+x'
+    owner: root
+    group: root
+
+- name: Start Script
+  shell: "{{ destin_folder }}/rabbitmq.sh"
+
+- name: Installation result
+  shell: systemctl status rabbitmq-server
+  register: result
+
+- debug:
+    var: result
+
+- name: Start RabbitMq Server
+  shell: systemctl start rabbitmq-server
+
+- name: Enable Management Plugin
+  shell: rabbitmq-plugins enable rabbitmq_management
+
+- name: Create Virtual host RabbitMq
+  shell: rabbitmqctl add_vhost dev_vlad
+
+- name: Create User for RabbitMq
+  shell: rabbitmqctl add_user vladislav 123321
+  ignore_errors: yes
+
+- name: Policy for Vhost
+  shell: sudo rabbitmqctl set_permissions -p dev_vlad vladislav ".*" ".*" ".*"
+  ignore_errors: yes
+
+- name: Add Management Tag to RabbitMQ User
+  shell: rabbitmqctl set_user_tags vladislav management
+

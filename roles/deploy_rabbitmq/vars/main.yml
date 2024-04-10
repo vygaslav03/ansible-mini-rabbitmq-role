@@ -1,0 +1,7 @@
+---
+# vars file for deploy_rabbitmq
+
+vars:
+  source_folder: /home/ec2-user/ansible/roles/deploy_rabbitmq/files
+  destin_folder: /home/ubuntu/Downloads
+
